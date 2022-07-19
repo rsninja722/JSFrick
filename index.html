@@ -1,0 +1,175 @@
+.<script>
+document.body.innerText="";
+var title = document.createElement("h1");
+title.innerText="JS Frick";
+document.body.appendChild(title);
+document.body.style.backgroundColor = "#112";
+document.body.style.color = "#fff";
+document.body.style.fontFamily = "consolas, monospace";
+
+// exclude: alphanumaric and strings/literal exprestions     qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`'"/
+// constructor: (()=>{_=3;return (_=>_).constructor("code")})()()
+
+
+class mappings {
+    static list = new Map();
+    static varMap = new Map();
+
+    static create(value,assignment) {
+        mappings.list.set(value,new mappings($_.next,assignment));
+    }
+
+    static reset() {
+        for(var i of mappings.list) {
+            i[1].required = false;
+        }
+    }
+
+    constructor(variable,assignment) {
+        this.variable = variable;
+        mappings.varMap.set(variable,this);
+        this.assignment = assignment;
+        this.dependencies = new Set();
+
+        for(var i of mappings.list) {
+            if(i[0].length > 1) {
+                if(this.assignment.includes(i[0])) {
+                    this.assignment = this.assignment.replaceAll(i[0],i[1].variable);
+                    this.dependencies.add(i[0]);
+                }
+            }
+        }
+        
+        var toReplace = [...this.assignment.matchAll(new RegExp("[^!$%^&*()_+{}|:<>?\\-=\\[\\]\\\\;,.~]","g"))].map(_=>_[0]);
+        for (var i of toReplace) {
+            this.dependencies.add(i);
+            this.assignment = this.assignment.replaceAll(i,mappings.list.get(i).variable);
+        }
+
+
+        this.required = false;
+    }
+
+    require() {
+        if(this.required) {
+            return;
+        }
+
+        this.required = true;
+
+        for(var i of this.dependencies) {
+            mappings.varMap.get(i).require();
+        }
+    }
+
+    getDependencies() {
+        var ret = new Set();
+        for(var i of this.dependencies) {
+            ret.add(i);
+            [...mappings.list.get(i).getDependencies()].map(_=>ret.add(_));
+        }
+        return ret;
+    }
+
+}
+
+class $_ {
+    static leftNum = 0;
+    static rightNum = 0;
+    static leftSize = 2;
+    static rightSize = 2;
+
+    static generate() {
+        var left = $_.leftNum.toString(2).padStart(Math.log2($_.leftSize),"_");;
+        left = left.replaceAll("0","_");
+        left = left.replaceAll("1","$");
+        var right = $_.rightNum.toString(2).padStart(Math.log2($_.rightSize),"_");
+        right = right.replaceAll("0","_");
+        right = right.replaceAll("1","$");
+
+        return left+"."+right;
+    }
+
+    static get next() {
+        var ret = $_.generate();
+        
+        // go through all right numbers
+        $_.rightNum++;
+        if($_.rightNum === $_.rightSize) {
+            $_.rightNum = 0;
+            
+            // go through all left numbers
+            $_.leftNum++;
+            
+            // all combinations for this size found
+            if($_.leftNum === $_.leftSize) {
+                $_.leftNum = 0;
+
+                // increase sizes in a way that all combinations are used
+                // (not in order of increasing size after variable 196, but its fairly close)
+                var ls = $_.leftSize;
+                var rs = $_.rightSize;
+                if (ls === rs) {
+                    $_.leftSize <<= 1;
+                    $_.rightSize = 2;
+                } else if(ls<<1 === rs) {
+                    $_.leftSize = rs;
+                } else if(ls > rs) {
+                    $_.leftSize = rs;
+                    $_.rightSize = ls;
+                } else {
+                    $_.leftSize = rs;
+                    $_.rightSize = ls << 1;
+                } 
+            }
+        }
+
+        return ret;
+    }
+}
+
+mappings.create("0", "+[]");
+mappings.create("1", "-~[]");
+mappings.create("2", "-~-~[]");
+mappings.create("3", "-~-~-~[]");
+mappings.create("4", "-~-~-~-~[]");
+mappings.create("5", "-~-~-~-~-~[]");
+mappings.create("6", "-~-~-~-~-~-~[]");
+mappings.create("7", "-~-~-~-~-~-~-~[]");
+mappings.create("8", "-~-~-~-~[]<<-~[]");
+mappings.create("9", "+([-~[]]+(+[]))+~[]");
+mappings.create("false", "![]+[]");
+mappings.create("true", "!![]+[]");
+mappings.create("a", "false[1]");
+mappings.create("e", "true[3]");
+mappings.create("f", "false[0]");
+mappings.create("l", "false[2]");
+mappings.create("r", "true[1]");
+mappings.create("s", "false[3]");
+mappings.create("t", "true[0]");
+mappings.create("u", "true[2]");
+
+
+for(var i of mappings.list) {
+    var p = document.createElement("p");
+    var deps = [...i[1].getDependencies()].toString();
+    p.innerHTML = `${i[1].variable} = ${i[1].assignment}; ${("("+i[0]+")").fontcolor("#00ff00")} ${deps ? "dependencies: ".fontcolor("#bbbbbb") + deps: ""}`;
+    document.body.appendChild(p);
+}
+
+// var map = {
+//     "(": ((()=>{+_*-$|[];})+[])[+[]],
+// };
+
+// _ = 1;
+// $ = 0;
+// __ = 2;
+// ___ = 3;
+// ____ = 4;
+// _____ = 5;
+// constructor = ({} + "")[_____] + ({} + "")[_] + ({} [$] + "")[_] + (($ != $) + "")[___] + (($ == $) + "")[$] + (($ == $) + "")[_] + (($ == $) + "")[__] + ({} + "")[_____] + (($ == $) + "")[$] + ({} + "")[_] + (($ == $) + "")[_];
+// ($)[constructor][constructor]($$$ + "('" + $_$ + "')")
+
+
+(_=>{_[+[]]=(((()=>{})+[])[+[]]);return (_=>_).constructor("'"+_[+[]]+![]+"'")})({})()
+</script>
