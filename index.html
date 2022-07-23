@@ -158,7 +158,7 @@ mappings.create("f", "false[0]");
 mappings.create("i", "Infinity[3]");
 mappings.create("j", "[object Object][3]");
 mappings.create("l", "false[2]");
-mappings.create("n", "Infinity[4]");
+mappings.create("n", "undefined[1]");
 mappings.create("o", "[object Object][1]");
 mappings.create("r", "true[1]");
 mappings.create("s", "false[3]");
@@ -170,8 +170,8 @@ mappings.create("_", "((_=>_)+[])[0]");
 mappings.create("$", "(($=>$)+[])[0]");
 mappings.create("(", "((()=>{})+[])[0]");
 mappings.create(")", "((()=>{})+[])[1]");
-mappings.create("{", "((()=>{})+[])[4]");
-mappings.create("}", "((()=>{})+[])[5]");
+mappings.create("{", "((_=>{})+[])[3]");
+mappings.create("}", "((_=>{})+[])[4]");
 mappings.create(">", "((_=>_)+[])[2]");
 mappings.create("<", "((_=>_<_)+[])[4]");
 mappings.create("~", "((_=>~_)+[])[3]");
@@ -212,46 +212,53 @@ mappings.create('"', "fontcolor[1+2]");
 mappings.create("/", "fontcolor[2+5]");
 
 
+
+
+
 // unit tests (verifies each variable is set to the correct value)
+function test() {
+    var inits = new Set();
+    mappings.list.forEach(_=>inits.add(_.variable.split(".")[0]));
 
-var inits = new Set();
-mappings.list.forEach(_=>inits.add(_.variable.split(".")[0]));
+    var func = "";
 
-var func = "";
+    inits.forEach(a=>func+= `${a}={};`);
 
-inits.forEach(a=>func+= `${a}={};`);
-
-for(var i of mappings.list) {
-    var p = document.createElement("p");
-    var deps = [...i[1].getDependencies()].toString();
-    p.innerHTML = `${i[1].variable} = ${i[1].assignment}; ${(i[0]).fontcolor("#00ff00")} ${deps ? "dependencies: ".fontcolor("#bbbbbb") + deps: ""}`;
-    func += `${i[1].variable}=${i[1].assignment};`;
-    document.body.appendChild(p);
-}
-func += "return {";
-
-inits.forEach(a=>func+= `${a}:${a},`);
-func = func.slice(0, -1); 
-func += "};";
-
-
-func = Function.constructor(func);
-
-var vars = {};
-
-var funcRes = func(); 
-
-for(let [k, v] of Object.entries(funcRes)) {
-    for(let [kk, vv] of Object.entries(v)) {
-        vars[`${k}.${kk}`] = vv;
+    for(var i of mappings.list) {
+        var p = document.createElement("p");
+        var deps = [...i[1].getDependencies()].toString();
+        p.innerHTML = `${i[1].variable} = ${i[1].assignment}; ${(i[0]).fontcolor("#00ff00")} ${deps ? "dependencies: ".fontcolor("#bbbbbb") + deps: ""}`;
+        func += `${i[1].variable}=${i[1].assignment};`;
+        document.body.appendChild(p);
     }
+    func += "return {";
+
+    inits.forEach(a=>func+= `${a}:${a},`);
+    func = func.slice(0, -1); 
+    func += "};";
+
+
+    func = Function.constructor(func);
+
+    var vars = {};
+
+    var funcRes = func(); 
+
+    for(let [k, v] of Object.entries(funcRes)) {
+        for(let [kk, vv] of Object.entries(v)) {
+            vars[`${k}.${kk}`] = vv;
+        }
+    }
+
+    for(var i of mappings.list) {
+        if(i[0] !== vars[i[1].variable]) {
+            console.warn(`${i[0]} != ${vars[i[1].variable]}`);
+        }
+    }
+
 }
 
-for(var i of mappings.list) {
-    if(i[0] !== vars[i[1].variable]) {
-        console.warn(`${i[0]} != ${vars[i[1].variable]}`);
-    }
-}
+test();
 
 // var map = {
 //     "(": ((()=>{+_*-$|[];})+[])[+[]],
