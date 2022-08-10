@@ -1,278 +1,288 @@
+<head><meta charset="utf-8" /></head>
 .<script>
-document.body.innerText="";
-var title = document.createElement("h1");
-title.innerText="JS Frick";
-document.body.appendChild(title);
-document.body.style.backgroundColor = "#112";
-document.body.style.color = "#fff";
-document.body.style.fontFamily = "consolas, monospace";
+    document.body.innerText="";
+    var title = document.createElement("h1");
+    title.innerText="JS Frick";
+    document.body.appendChild(title);
+    document.body.style.backgroundColor = "#112";
+    document.body.style.color = "#fff";
+    document.body.style.fontFamily = "consolas, monospace";
 
-// exclude: alphanumaric and strings/literal exprestions     qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`'"/
-// constructor: (()=>{_=3;return (_=>_).constructor("code")})()()
-// TODO change final function to be ((_,$,__ ...) => {})({},{},{} ...)
-
-class mappings {
-    static list = new Map();
-    static varMap = new Map();
-
-    static create(value,assignment) {
-        mappings.list.set(value,new mappings($_.next,assignment));
-    }
-
-    static reset() {
-        for(var i of mappings.list) {
-            i[1].required = false;
+    var mappingDefs = {};
+    
+    class mappings {
+        static list = new Map();
+        static varMap = new Map();
+    
+        static create(value,assignment) {
+            mappings.list.set(value,new mappings($_.next,assignment));
         }
-    }
+    
+        static reset() {
+            $_.reset();
 
-    constructor(variable,assignment) {
-        this.variable = variable;
-        this.escapedVariable = variable.replaceAll("$","$$$$");
-        mappings.varMap.set(variable,this);
-        this.assignment = assignment;
-        this.dependencies = new Set();
-
-        for(var i of new Map([...mappings.list.entries()].sort((a,b) => b[0].length - a[0].length))) {
-            if(i[0].length > 1) {
-                if(this.assignment.includes(i[0])) {
-                    this.assignment = this.assignment.replaceAll(i[0],i[1].escapedVariable);
-                    this.dependencies.add(i[0]);
-                }
-            } else {
-                break;
-            }
+            mappings.list = new Map();
+            mappings.varMap = new Map();
         }
-        var toReplace = [...this.assignment.matchAll(new RegExp("[^!$%^&*()_+{}|:<>?\\-=\\[\\]\\\\;,.~]","g"))].map(_=>_[0]);
-        
-        for (var i of toReplace) {
-            this.assignment = this.assignment.replaceAll(i,mappings.list.get(i).escapedVariable);
-            this.dependencies.add(i);
-        }
-
-
-        this.required = false;
-    }
-
-    require() {
-        if(this.required) {
-            return;
-        }
-
-        this.required = true;
-
-        for(var i of this.dependencies) {
-            mappings.varMap.get(i).require();
-        }
-    }
-
-    getDependencies() {
-        var ret = new Set();
-        for(var i of this.dependencies) {
-            ret.add(i);
-            [...mappings.list.get(i).getDependencies()].map(_=>ret.add(_));
-        }
-        return ret;
-    }
-
-}
-
-class $_ {
-    static leftNum = 0;
-    static rightNum = 0;
-    static leftSize = 2;
-    static rightSize = 2;
-
-    static generate() {
-        var left = $_.leftNum.toString(2).padStart(Math.log2($_.leftSize),"_");;
-        left = left.replaceAll("0","_");
-        left = left.replaceAll("1","$");
-        var right = $_.rightNum.toString(2).padStart(Math.log2($_.rightSize),"_");
-        right = right.replaceAll("0","_");
-        right = right.replaceAll("1","$");
-
-        return left+"."+right;
-    }
-
-    static get next() {
-        var ret = $_.generate();
-        
-        // go through all right numbers
-        $_.rightNum++;
-        if($_.rightNum === $_.rightSize) {
-            $_.rightNum = 0;
-            
-            // go through all left numbers
-            $_.leftNum++;
-            
-            // all combinations for this size found
-            if($_.leftNum === $_.leftSize) {
-                $_.leftNum = 0;
-
-                // increase sizes in a way that all combinations are used
-                // (not in order of increasing size after variable 196, but its fairly close)
-                var ls = $_.leftSize;
-                var rs = $_.rightSize;
-                if (ls === rs) {
-                    $_.leftSize <<= 1;
-                    $_.rightSize = 2;
-                } else if(ls<<1 === rs) {
-                    $_.leftSize = rs;
-                } else if(ls > rs) {
-                    $_.leftSize = rs;
-                    $_.rightSize = ls;
+    
+        constructor(variable,assignment) {
+            this.variable = variable;
+            this.escapedVariable = variable.replaceAll("$","$$$$");
+            mappings.varMap.set(variable,this);
+            this.rawAssignment = assignment;
+            this.assignment = assignment;
+            this.dependencies = new Set();
+    
+            for(var i of new Map([...mappings.list.entries()].sort((a,b) => b[0].length - a[0].length))) {
+                if(i[0].length > 1) {
+                    if(this.assignment.includes(i[0])) {
+                        this.assignment = this.assignment.replaceAll(i[0],i[1].escapedVariable);
+                        this.dependencies.add(i[0]);
+                    }
                 } else {
-                    $_.leftSize = rs;
-                    $_.rightSize = ls << 1;
-                } 
+                    break;
+                }
+            }
+            var toReplace = [...this.assignment.matchAll(new RegExp("[^!$%^&*()_+{}|:<>?\\-=\\[\\]\\\\;,.~]","g"))].map(_=>_[0]);
+            
+            for (var i of toReplace) {
+                this.assignment = this.assignment.replaceAll(i,mappings.list.get(i).escapedVariable);
+                this.dependencies.add(i);
+            }
+    
+    
+            this.required = false;
+        }
+    
+        require() {
+            if(this.required) {
+                return;
+            }
+    
+            this.required = true;
+    
+            for(var i of this.dependencies) {
+                mappings.varMap.get(i).require();
+            }
+        }
+    
+        getDependencies() {
+            var ret = new Set();
+            for(var i of this.dependencies) {
+                ret.add(i);
+                [...mappings.list.get(i).getDependencies()].map(_=>ret.add(_));
+            }
+            return ret;
+        }
+    
+    }
+    
+    class $_ {
+        static leftNum = 0;
+        static rightNum = 0;
+        static leftSize = 2;
+        static rightSize = 2;
+
+        static reset() {
+            $_.leftNum = 0;
+            $_.rightNum = 0;
+            $_.leftSize = 2;
+            $_.rightSize = 2;
+        }
+    
+        static generate() {
+            var left = $_.leftNum.toString(2).padStart(Math.log2($_.leftSize),"_");;
+            left = left.replaceAll("0","_");
+            left = left.replaceAll("1","$");
+            var right = $_.rightNum.toString(2).padStart(Math.log2($_.rightSize),"_");
+            right = right.replaceAll("0","_");
+            right = right.replaceAll("1","$");
+    
+            return left+"."+right;
+        }
+    
+        static get next() {
+            var ret = $_.generate();
+            
+            // go through all right numbers
+            $_.rightNum++;
+            if($_.rightNum === $_.rightSize) {
+                $_.rightNum = 0;
+                
+                // go through all left numbers
+                $_.leftNum++;
+                
+                // all combinations for this size found
+                if($_.leftNum === $_.leftSize) {
+                    $_.leftNum = 0;
+    
+                    // increase sizes in a way that all combinations are used
+                    // (not in order of increasing size after variable 196, but its fairly close)
+                    var ls = $_.leftSize;
+                    var rs = $_.rightSize;
+                    if (ls === rs) {
+                        $_.leftSize <<= 1;
+                        $_.rightSize = 2;
+                    } else if(ls<<1 === rs) {
+                        $_.leftSize = rs;
+                    } else if(ls > rs) {
+                        $_.leftSize = rs;
+                        $_.rightSize = ls;
+                    } else {
+                        $_.leftSize = rs;
+                        $_.rightSize = ls << 1;
+                    } 
+                }
+            }
+            
+            return ret;
+        }
+    }
+
+    function recursiveGenerate(name) {
+        for(var i of mappingDefs[name].dependencies) {
+            if(!mappings.list.has(i)) {
+                recursiveGenerate(i);
+            }
+        }
+        
+        mappings.create(name,mappingDefs[name].assignment);
+    }
+    
+    function compile(js) {
+        var jsFrick = "";
+        var chars = [];
+
+        mappings.reset();
+
+        recursiveGenerate("constructor");
+        recursiveGenerate("return ");
+
+        for(var i of js) {
+            if(mappingDefs.hasOwnProperty(i)) {
+                if (!mappings.list.has(i)) {
+                    recursiveGenerate(i);
+                }
+                chars.push(mappings.list.get(i).variable);
+            } else {
+                mappingDefs[i] = {assignment:`fromCharCode(${(i.charCodeAt(0)+"").split("").join("+")})`, dependencies:["0","1","2","3","4","5","6","7","8","9","true","false","[object Object]","undefined"," ","a","c","d","e","f","n","o","r","s","t","u","constructor","NumberConstructor","StringConstructor","m","String","toString","return ","p","h","C","fromCharCode"]}
+                recursiveGenerate(i);
+                chars.push(mappings.list.get(i).variable);
             }
         }
 
-        return ret;
+        var inits = new Set();
+        mappings.list.forEach(_=>inits.add(_.variable.split(".")[0]));
+
+        jsFrick += `${([...inits].join("={};"))}={};((${([...inits].join(","))})=>{${[...mappings.list].map(([_,$])=>`${$.variable}=${$.assignment}`).join(";")};})(${([...inits].join(","))});(()=>(_=>_)[${mappings.list.get("constructor").assignment}](${chars.join("+")}))()()`;
+        // jsFrick += `(((${([...inits].join(","))})=>{${[...mappings.list].map(([_,$])=>`${$.variable}=${$.assignment}`).join(";")};return (_=>_)[${mappings.list.get("constructor").assignment}](${chars.join("+")})})(${[...inits].map(_=>"{}").join(",")}))();`;
+        
+        return jsFrick;
     }
-}
-
-mappings.create("0", "+[]+[]");
-mappings.create("1", "-~[]+[]");
-mappings.create("2", "-~-~[]+[]");
-mappings.create("3", "-~-~-~[]+[]");
-mappings.create("4", "-~-~-~-~[]+[]");
-mappings.create("5", "-~-~-~-~-~[]+[]");
-mappings.create("6", "-~-~-~-~-~-~[]+[]");
-mappings.create("7", "-~-~-~-~-~-~-~[]+[]");
-mappings.create("8", "(-~-~-~-~[]<<-~[])+[]");
-mappings.create("9", "+([-~[]]+(+[]))+~[]+[]");
-
-mappings.create("false", "![]+[]");
-mappings.create("true", "!![]+[]");
-mappings.create("[object Object]", "[]+{}");
-mappings.create("Infinity", "5**5**5+[]");
-mappings.create("undefined", "[][[]]+[]");
-
-mappings.create(" ", "[object Object][7]");
-mappings.create("a", "false[1]");
-mappings.create("b", "[object Object][2]");
-mappings.create("c", "[object Object][5]");
-mappings.create("d", "undefined[2]");
-mappings.create("e", "true[3]");
-mappings.create("f", "false[0]");
-mappings.create("i", "Infinity[3]");
-mappings.create("j", "[object Object][3]");
-mappings.create("l", "false[2]");
-mappings.create("n", "undefined[1]");
-mappings.create("o", "[object Object][1]");
-mappings.create("r", "true[1]");
-mappings.create("s", "false[3]");
-mappings.create("t", "true[0]");
-mappings.create("u", "true[2]");
-mappings.create("y", "Infinity[7]");
-mappings.create("=", "((_=>_)+[])[1]");
-mappings.create("_", "((_=>_)+[])[0]");
-mappings.create("$", "(($=>$)+[])[0]");
-mappings.create("(", "((()=>{})+[])[0]");
-mappings.create(")", "((()=>{})+[])[1]");
-mappings.create("{", "((_=>{})+[])[3]");
-mappings.create("}", "((_=>{})+[])[4]");
-mappings.create(">", "((_=>_)+[])[2]");
-mappings.create("<", "((_=>_<_)+[])[4]");
-mappings.create("~", "((_=>~_)+[])[3]");
-mappings.create("!", "((_=>!_)+[])[3]");
-mappings.create("%", "((_=>_%_)+[])[4]");
-mappings.create("^", "((_=>_^_)+[])[4]");
-mappings.create("&", "((_=>_&_)+[])[4]");
-mappings.create("|", "((_=>_|_)+[])[4]");
-mappings.create("^", "((_=>_^_)+[])[4]");
-mappings.create("*", "((_=>_*_)+[])[4]");
-mappings.create("-", "((_=>_-_)+[])[4]");
-mappings.create("+", "((_=>_+_)+[])[4]");
-mappings.create("[", "((_=>[])+[])[3]");
-mappings.create("]", "((_=>[])+[])[4]");
-
-mappings.create("I", "Infinity[0]");
-mappings.create("O", "[object Object][8]");
-
-mappings.create("constructor", "c+o+n+s+t+r+u+c+t+o+r");
-mappings.create("fontcolor", "([]+[])[f+o+n+t+c+o+l+o+r]()");
-mappings.create("NumberConstructor", "(+[])[constructor]");
-mappings.create("StringConstructor", "([]+[])[constructor]");
-mappings.create("m", "(NumberConstructor+[])[1+1]");
-
-mappings.create("String", "StringConstructor[n+a+m+e]");
-mappings.create("toString", "t+o+String");
-mappings.create("return ", "r+e+t+u+r+n+ ");
-
-mappings.create("p", "(+(2+1+1))[toString](3+1)[1]");
-mappings.create("h", "(+(1+0+1))[toString](2+1)[1]");
-mappings.create("C", "((()=>{})[constructor](return +e+s+c+a+p+e)()(((_=>_<_)+[])[4]))[2]");
-
-mappings.create("fromCharCode", "([]+[])[constructor][f+r+o+m+C+h+a+r+C+o+d+e]");
-
-mappings.create("E", "fromCharCode(6+9)");
-
-mappings.create('"', "fontcolor[1+2]");
-mappings.create("/", "fontcolor[2+5]");
-
-
-
-
-
-// unit tests (verifies each variable is set to the correct value)
-function test() {
-    var inits = new Set();
-    mappings.list.forEach(_=>inits.add(_.variable.split(".")[0]));
-
-    var func = "";
-
-    inits.forEach(a=>func+= `${a}={};`);
-
-    for(var i of mappings.list) {
-        var p = document.createElement("p");
-        var deps = [...i[1].getDependencies()].toString();
-        p.innerHTML = `${i[1].variable} = ${i[1].assignment}; ${(i[0]).fontcolor("#00ff00")} ${deps ? "dependencies: ".fontcolor("#bbbbbb") + deps: ""}`;
-        func += `${i[1].variable}=${i[1].assignment};`;
-        document.body.appendChild(p);
-    }
-    func += "return {";
-
-    inits.forEach(a=>func+= `${a}:${a},`);
-    func = func.slice(0, -1); 
-    func += "};";
-
-
-    func = Function.constructor(func);
-
-    var vars = {};
-
-    var funcRes = func(); 
-
-    for(let [k, v] of Object.entries(funcRes)) {
-        for(let [kk, vv] of Object.entries(v)) {
-            vars[`${k}.${kk}`] = vv;
+    
+    function init() {
+        mappings.create("0", "+[]+[]");
+        mappings.create("1", "-~[]+[]");
+        mappings.create("2", "-~-~[]+[]");
+        mappings.create("3", "-~-~-~[]+[]");
+        mappings.create("4", "-~-~-~-~[]+[]");
+        mappings.create("5", "-~-~-~-~-~[]+[]");
+        mappings.create("6", "-~-~-~-~-~-~[]+[]");
+        mappings.create("7", "-~-~-~-~-~-~-~[]+[]");
+        mappings.create("8", "(-~-~-~-~[]<<-~[])+[]");
+        mappings.create("9", "+([-~[]]+(+[]))+~[]+[]");
+        
+        mappings.create("false", "![]+[]");
+        mappings.create("true", "!![]+[]");
+        mappings.create("[object Object]", "[]+{}");
+        mappings.create("Infinity", "5**5**5+[]");
+        mappings.create("undefined", "[][[]]+[]");
+        
+        mappings.create(" ", "[object Object][7]");
+        mappings.create("a", "false[1]");
+        mappings.create("b", "[object Object][2]");
+        mappings.create("c", "[object Object][5]");
+        mappings.create("d", "undefined[2]");
+        mappings.create("e", "true[3]");
+        mappings.create("f", "false[0]");
+        mappings.create("i", "Infinity[3]");
+        mappings.create("j", "[object Object][3]");
+        mappings.create("l", "false[2]");
+        mappings.create("n", "undefined[1]");
+        mappings.create("o", "[object Object][1]");
+        mappings.create("r", "true[1]");
+        mappings.create("s", "false[3]");
+        mappings.create("t", "true[0]");
+        mappings.create("u", "true[2]");
+        mappings.create("y", "Infinity[7]");
+        mappings.create("=", "((_=>_)+[])[1]");
+        mappings.create("_", "((_=>_)+[])[0]");
+        mappings.create("$", "(($=>$)+[])[0]");
+        mappings.create("(", "((()=>{})+[])[0]");
+        mappings.create(")", "((()=>{})+[])[1]");
+        mappings.create("{", "((_=>{})+[])[3]");
+        mappings.create("}", "((_=>{})+[])[4]");
+        mappings.create(">", "((_=>_)+[])[2]");
+        mappings.create("<", "((_=>_<_)+[])[4]");
+        mappings.create("~", "((_=>~_)+[])[3]");
+        mappings.create("!", "((_=>!_)+[])[3]");
+        mappings.create("%", "((_=>_%_)+[])[4]");
+        mappings.create("^", "((_=>_^_)+[])[4]");
+        mappings.create("&", "((_=>_&_)+[])[4]");
+        mappings.create("|", "((_=>_|_)+[])[4]");
+        mappings.create("^", "((_=>_^_)+[])[4]");
+        mappings.create("*", "((_=>_*_)+[])[4]");
+        mappings.create("-", "((_=>_-_)+[])[4]");
+        mappings.create("+", "((_=>_+_)+[])[4]");
+        mappings.create("[", "((_=>[])+[])[3]");
+        mappings.create("]", "((_=>[])+[])[4]");
+        mappings.create(";", "((_=>{;})+[])[4]");
+        mappings.create(":", "((_=>{_?_:_})+[])[7]");
+        mappings.create("?", "((_=>{_?_:_})+[])[5]");
+        mappings.create(".", "((_=>{_._})+[])[5]");
+        mappings.create(",", "((_=>[,])+[])[4]");
+        
+        mappings.create("I", "Infinity[0]");
+        mappings.create("O", "[object Object][8]");
+        
+        mappings.create("constructor", "c+o+n+s+t+r+u+c+t+o+r");
+        mappings.create("fontcolor", "([]+[])[f+o+n+t+c+o+l+o+r]()");
+        mappings.create("NumberConstructor", "(+[])[constructor]");
+        mappings.create("StringConstructor", "([]+[])[constructor]");
+        mappings.create("m", "(NumberConstructor+[])[1+1]");
+        
+        mappings.create('"', "fontcolor[1+2]");
+        mappings.create("/", "fontcolor[2+5]");
+        
+        mappings.create("String", "StringConstructor[n+a+m+e]");
+        mappings.create("toString", "t+o+String");
+        mappings.create("return ", "r+e+t+u+r+n+ ");
+        
+        mappings.create("p", "(+(2+1+1))[toString](3+1)[1]");
+        mappings.create("h", "(+(1+0+1))[toString](2+1)[1]");
+        mappings.create("C", "((()=>{})[constructor](return +e+s+c+a+p+e)()(((_=>_<_)+[])[4]))[2]");
+        
+        mappings.create("fromCharCode", "([]+[])[constructor][f+r+o+m+C+h+a+r+C+o+d+e]");
+        
+        mappings.create("g", "String[5]");
+        mappings.create("k", "(+(2+0))[toString](2+1)");
+        mappings.create("q", "(+(2+6))[toString](2+7)");
+        mappings.create("v", "(+(3+1))[toString](3+2)");
+        mappings.create("w", "(+(3+2))[toString](3+3)");
+        mappings.create("x", "(+(3+3))[toString](3+4)");
+        mappings.create("z", "(+(3+5))[toString](3+6)");
+    
+        for(var [k,v] of mappings.list) {
+            mappingDefs[k] = {assignment:v.rawAssignment, dependencies:[...v.getDependencies()]};
         }
+        
+        mappings.reset();
     }
+    
+    
+    init();
 
-    for(var i of mappings.list) {
-        if(i[0] !== vars[i[1].variable]) {
-            console.warn(`${i[0]} != ${vars[i[1].variable]}`);
-        }
-    }
+    console.log(compile("alert(1)"));
+    console.log(compile("console.log(`꧁﷽꧂`)"));
 
-}
-
-test();
-
-// var map = {
-//     "(": ((()=>{+_*-$|[];})+[])[+[]],
-// };
-
-// _ = 1;
-// $ = 0;
-// __ = 2;
-// ___ = 3;
-// ____ = 4;
-// _____ = 5;
-// constructor = ({} + "")[_____] + ({} + "")[_] + ({} [$] + "")[_] + (($ != $) + "")[___] + (($ == $) + "")[$] + (($ == $) + "")[_] + (($ == $) + "")[__] + ({} + "")[_____] + (($ == $) + "")[$] + ({} + "")[_] + (($ == $) + "")[_];
-// ($)[constructor][constructor]($$$ + "('" + $_$ + "')")
-
-
-(_=>{_[+[]]=(((()=>{})+[])[+[]]);return (_=>_).constructor("'"+_[+[]]+![]+"'")})({})()
-</script>
+    </script>
