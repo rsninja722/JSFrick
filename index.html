@@ -1,12 +1,43 @@
 <head><meta charset="utf-8" /></head>
 .<script>
-    document.body.innerText="";
-    var title = document.createElement("h1");
-    title.innerText="JS Frick";
-    document.body.appendChild(title);
-    document.body.style.backgroundColor = "#112";
-    document.body.style.color = "#fff";
-    document.body.style.fontFamily = "consolas, monospace";
+    function dc(element,parent,attributes=[]) {
+        var e = document.createElement(element);
+        for(var i of attributes) {
+            e[i[0]] = i[1];
+        }
+        parent.appendChild(e);
+        return e;
+    }
+    var db = document.body;
+
+    db.innerText="";
+
+    dc("style",document.head,[["type","text/css"],["innerHTML",`
+.inline {vertical-align: top;}
+html {background-color: #112;color: #fff;font-family: consolas, monospace;}
+textarea {background-color: rgb(21 21 43);color: rgb(255, 255, 255);border: 1px solid rgb(187, 187, 255);border-radius: 5px;box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px;padding: 0.5em;}
+button {background-color: rgb(21 21 43);color: rgb(255, 255, 255);border: 1px solid rgb(187, 187, 255);border-radius: 5px;margin: 1em;font-size: 1.3em;padding: 0.3em;box-shadow: rgb(0 0 0 / 70%) 0px 4px 6px, rgb(0 0 0 / 90%) 0px 3px 6px;}
+button:active {box-shadow: none;transform: translateY(3px);}
+button:hover {background-color: rgb(41 41 63);}
+`]]);
+
+    dc("h1",db,[["innerText","JS Frick"]]);
+    var button = dc("button",db,[["innerText","compile"]]);
+    var div = dc("div",db);
+    dc("span",div,[["innerText","JS: "],["className","inline"]]);
+    var inputText = dc("textarea",div,[["className","inline"],["style","width:350px;height: 250px;"],["placeholder","Enter JS here"]]);
+    dc("span",div,[["innerText"," --> JS Frick: "],["className","inline"]]);
+    var outputText = dc("textarea",div,[["className","inline"],["style","width:350px;height: 250px;"]]);
+    var errorPre = dc("pre", db);
+
+    button.onclick = function () {
+        var input = inputText.value;
+        try {
+            outputText = compile(input);
+        } catch (error) {
+            errorPre.innerText = error.toString();
+        }
+    };
 
     var mappingDefs = {};
     
@@ -150,7 +181,6 @@
     }
     
     function compile(js) {
-        var jsFrick = "";
         var chars = [];
 
         mappings.reset();
@@ -171,13 +201,49 @@
             }
         }
 
+        var words = new Set();
+        var duplicates = [];
+
+        for(var i of js.matchAll(/([A-Za-z1-9_-])+/g)) {
+            if(words.has(i[0])) {
+                if(!duplicates.includes(i[0])) {
+                    duplicates.push(i[0]);
+                }
+            } else {
+                words.add(i[0]);
+            }
+        }
+
+        for(var i of duplicates) {
+            if(i.length < 2) {
+                continue; 
+            }
+            mappings.create(i,i.split("").join("+"));
+            var variable = mappings.list.get(i).variable;
+            console.log(mappings.list.get(i));
+            console.log(mappings.list.get(i).variable);
+            var index = js.indexOf(i);
+
+            while(index != -1) {
+                chars.splice(index,i.length);
+                chars.splice(index,0,variable);
+                js = js.replace(i,".");
+
+                index = js.indexOf(i,index+i.length);
+            }
+        }
+
+
         var inits = new Set();
         mappings.list.forEach(_=>inits.add(_.variable.split(".")[0]));
+        inits = [...inits];
 
-        jsFrick += `${([...inits].join("={};"))}={};((${([...inits].join(","))})=>{${[...mappings.list].map(([_,$])=>`${$.variable}=${$.assignment}`).join(";")};})(${([...inits].join(","))});(()=>(_=>_)[${mappings.list.get("constructor").assignment}](${chars.join("+")}))()()`;
-        // jsFrick += `(((${([...inits].join(","))})=>{${[...mappings.list].map(([_,$])=>`${$.variable}=${$.assignment}`).join(";")};return (_=>_)[${mappings.list.get("constructor").assignment}](${chars.join("+")})})(${[...inits].map(_=>"{}").join(",")}))();`;
-        
-        return jsFrick;
+        var assignments = [...mappings.list].map(([_,$])=>`${$.variable}=${$.assignment}`);
+        var construct = mappings.list.get("constructor").assignment;
+
+        // return `${(inits.join("={};"))}={};((${(inits.join(","))})=>{${assignments.join(";")};})(${(inits.join(","))});(()=>(_=>_)[${construct}](${chars.join("+")}))()()`;
+        // return `(((${(inits.join(","))})=>{${assignments.join(";")};((_=>_)[${construct}](${chars.join("+")}))()})(${inits.map(_=>"{}").join(",")}));`;
+        return `(()=>(_=>_)[${construct}](${chars.join("+")}))(${inits.join("={},")}={},${assignments.join(",")})`;
     }
     
     function init() {
@@ -284,5 +350,6 @@
 
     console.log(compile("alert(1)"));
     console.log(compile("console.log(`꧁﷽꧂`)"));
-
+    console.log(compile("document.getElementById('i').value = 2;document.getElementById('i').innerHTML = 'bruh';document.getElementById('i').innerHTML = 'bruh';document.getElementById('i').innerHTML = 'bruh';"));
+    // console.log(compile("return '1234567890-=qwertyuiop[]\\asdfghjkl;zxcvbnm,./!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:\"ZXCVBNM<>?~`'"));
     </script>
