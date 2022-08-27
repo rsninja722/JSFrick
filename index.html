@@ -13,19 +13,19 @@
     db.innerText="";
 
     dc("style",document.head,[["type","text/css"],["innerHTML",`
-.inline {vertical-align: top;}
-html {background-color: #112;color: #fff;font-family: consolas, monospace;}
-textarea {background-color: rgb(21 21 43);color: rgb(255, 255, 255);border: 1px solid rgb(187, 187, 255);border-radius: 5px;box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px;padding: 0.5em;}
-button {background-color: rgb(21 21 43);color: rgb(255, 255, 255);border: 1px solid rgb(187, 187, 255);border-radius: 5px;margin: 1em;font-size: 1.3em;padding: 0.3em;box-shadow: rgb(0 0 0 / 70%) 0px 4px 6px, rgb(0 0 0 / 90%) 0px 3px 6px;}
-button:active {box-shadow: none;transform: translateY(3px);}
-button:hover {background-color: rgb(41 41 63);}
-`]]);
+        .inline {vertical-align: top;}
+        html {background-color: #040609;color: #dbe4ff;font-family: consolas, monospace;}
+        textarea {background-color: #090f16;color: #dbe4ff;border: 1px solid rgb(187, 187, 255);border-radius: 5px;box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px;padding: 0.5em;}
+        button {background-color: #090f16;color: #dbe4ff;border: 1px solid rgb(187, 187, 255);border-radius: 5px;margin: 1em;font-size: 1.3em;padding: 0.3em;box-shadow: rgb(0 0 0 / 80%) 0px 4px 6px, #000000 0px 3px 6px;}
+        button:active {background-color: #;box-shadow: none;transform: translateY(3px);}
+        button:hover {background-color: rgb(41 41 63);}
+        `]]);
 
     dc("h1",db,[["innerText","JS Frick"]]);
     var button = dc("button",db,[["innerText","compile"]]);
     var div = dc("div",db);
     dc("span",div,[["innerText","JS: "],["className","inline"]]);
-    var inputText = dc("textarea",div,[["className","inline"],["style","width:350px;height: 250px;"],["placeholder","Enter JS here"]]);
+    var inputText = dc("textarea",div,[["className","inline"],["style","width:350px;height: 250px;"],["placeholder","Enter JS here"],["value","console.log('a')"]]);
     dc("span",div,[["innerText"," --> JS Frick: "],["className","inline"]]);
     var outputText = dc("textarea",div,[["className","inline"],["style","width:350px;height: 250px;"]]);
     var errorPre = dc("pre", db);
@@ -33,7 +33,7 @@ button:hover {background-color: rgb(41 41 63);}
     button.onclick = function () {
         var input = inputText.value;
         try {
-            outputText = compile(input);
+            outputText.value = compile(input);
         } catch (error) {
             errorPre.innerText = error.toString();
         }
@@ -238,12 +238,14 @@ button:hover {background-color: rgb(41 41 63);}
         mappings.list.forEach(_=>inits.add(_.variable.split(".")[0]));
         inits = [...inits];
 
+        console.log(mappings.list);
+        console.log([...mappings.list]);
         var assignments = [...mappings.list].map(([_,$])=>`${$.variable}=${$.assignment}`);
         var construct = mappings.list.get("constructor").assignment;
 
         // return `${(inits.join("={};"))}={};((${(inits.join(","))})=>{${assignments.join(";")};})(${(inits.join(","))});(()=>(_=>_)[${construct}](${chars.join("+")}))()()`;
         // return `(((${(inits.join(","))})=>{${assignments.join(";")};((_=>_)[${construct}](${chars.join("+")}))()})(${inits.map(_=>"{}").join(",")}));`;
-        return `(()=>(_=>_)[${construct}](${chars.join("+")}))(${inits.join("={},")}={},${assignments.join(",")})`;
+        return `(()=>(_=>_)[${construct}](${chars.join("+")}))(${inits.join("={},")}={},${assignments.join(",")})()`;
     }
     
     function init() {
@@ -348,8 +350,8 @@ button:hover {background-color: rgb(41 41 63);}
     
     init();
 
-    console.log(compile("alert(1)"));
-    console.log(compile("console.log(`꧁﷽꧂`)"));
-    console.log(compile("document.getElementById('i').value = 2;document.getElementById('i').innerHTML = 'bruh';document.getElementById('i').innerHTML = 'bruh';document.getElementById('i').innerHTML = 'bruh';"));
-    // console.log(compile("return '1234567890-=qwertyuiop[]\\asdfghjkl;zxcvbnm,./!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:\"ZXCVBNM<>?~`'"));
+    // console.log(compile("alert(1)"));
+    // console.log(compile("console.log(`꧁﷽꧂`)"));
+    // console.log(compile("document.getElementById('i').value = 2;document.getElementById('i').innerHTML = 'bruh';document.getElementById('i').innerHTML = 'bruh';document.getElementById('i').innerHTML = 'bruh';"));
+
     </script>
