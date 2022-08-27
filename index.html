@@ -1,4 +1,3 @@
-<head><meta charset="utf-8" /></head>
 .<script>
     function dc(element,parent,attributes=[]) {
         var e = document.createElement(element);
@@ -12,28 +11,42 @@
 
     db.innerText="";
 
+    // document.head.innerHTML='<meta charset="utf-8"/>';
+    dc("title",document.head,[["innerText","JSFrick"]]);
+    dc("link",document.head,[["rel","icon"],["href","data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAENJREFUOE9j5BaW/89AAWAcNYBhEIfBhYsPUCLXQF+BAVkMxAcBnF4AKYYpgpmELAZj09YAZD8MUS9QFIjEZlCKUyIAiidM0QWXGX0AAAAASUVORK5CYII="]]);
     dc("style",document.head,[["type","text/css"],["innerHTML",`
-        .inline {vertical-align: top;}
-        html {background-color: #040609;color: #dbe4ff;font-family: consolas, monospace;}
-        textarea {background-color: #090f16;color: #dbe4ff;border: 1px solid rgb(187, 187, 255);border-radius: 5px;box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px;padding: 0.5em;}
-        button {background-color: #090f16;color: #dbe4ff;border: 1px solid rgb(187, 187, 255);border-radius: 5px;margin: 1em;font-size: 1.3em;padding: 0.3em;box-shadow: rgb(0 0 0 / 80%) 0px 4px 6px, #000000 0px 3px 6px;}
+        html {background-color: #0b131f;color: #dbe4ff;font-family: consolas, monospace;}
+        textarea,input {background-color: #090f16;color: #dbe4ff;border: 1px solid #bbbbff;border-style: none solid;box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px;padding: 0.5em;}
+        button {background-color: #090f16;color: #dbe4ff;border: 1px solid rgb(187, 187, 255);border-radius: 5px;margin-left: 1em;padding: 0.3em;box-shadow: rgb(0 0 0 / 80%) 0px 4px 6px, #000000 0px 3px 6px;}
         button:active {background-color: #;box-shadow: none;transform: translateY(3px);}
         button:hover {background-color: rgb(41 41 63);}
+        .css-checkbox { position: absolute; overflow: hidden; clip: rect(0 0 0 0); height: 1px; width: 1px; margin: -1px; padding: 0; border: 0; }
+        #inputPreview { display: flex; gap: 20px; justify-content: center;	}
+        .css-checkbox + label { position: relative; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; height: 26px; color: #dbe4ff; user-select: none; }
+        .css-checkbox + label::before { content: " "; display: inline-block; vertical-align: middle; margin-right: 3px; width: 20px; height: 20px; background-color: #090f16; border: 1px solid #dbe4ff; border-radius: 4px; box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px; }
+        .css-checkbox:checked + label::after { content: "*"; position: absolute; display: flex; justify-content: right; margin-left: 0px; left: 0px; top: -1px; text-align: center; background-color: transparent; font-size: 32px; height: 20px; width: 20px; }
         `]]);
 
-    dc("h1",db,[["innerText","JS Frick"]]);
-    var button = dc("button",db,[["innerText","compile"]]);
+    dc("h1",db,[["innerText","JSFrick"]]);
+    dc("p",db,[["innerHTML","JSFrick is an esotaric programming style of javascript inspired by <a href='http://www.jsfuck.com/'>JSFuck</a>. It uses only non-alphanumeric characters, also excluding `\"\' and / so that strings cannot be created directly. Try using the form below to convert any valid javasctipt or string into JSFrick"]]);
     var div = dc("div",db);
-    dc("span",div,[["innerText","JS: "],["className","inline"]]);
-    var inputText = dc("textarea",div,[["className","inline"],["style","width:350px;height: 250px;"],["placeholder","Enter JS here"],["value","console.log('a')"]]);
-    dc("span",div,[["innerText"," --> JS Frick: "],["className","inline"]]);
-    var outputText = dc("textarea",div,[["className","inline"],["style","width:350px;height: 250px;"]]);
-    var errorPre = dc("pre", db);
+    dc("span",div,[["innerText","JS: "]]);
+    var inputText = dc("input",div,[["type","text"],["style","width:20em;height: 1.5em;"],["placeholder","Enter JS here"],["value","alert(1)"]]);
+    var div2 = dc("div",div,[["style","vertical-align: middle;display: inline;margin-left: 1em;"]]);
+    var shouldEval = dc("input",div2,[["type","checkbox"],["className","css-checkbox"],["name","cssCheckbox"],["id","evelCheck"],["style","box-shadow: none;"]]);
+    dc("label",div2,[["innerText","eval"],["htmlFor","evelCheck"]]);
+    var button = dc("button",div,[["innerText","compile"]]);
+    dc("p",div,[["innerText","V"]]);
+    dc("p",div,[["innerText","V"]]);
+    dc("p",div,[["innerText","JS Frick: "]]);
+    var outputText = dc("textarea",div,[["style","width:400px;height: 250px;"]]);
+    var runButton = dc("button",div,[["innerText","run this"]]);
+    var errorPre = dc("pre", db,[["style","color: #ffa5a5;"]]);
 
     button.onclick = function () {
         var input = inputText.value;
         try {
-            outputText.value = compile(input);
+            outputText.value = compile(input,shouldEval.checked===true);
         } catch (error) {
             errorPre.innerText = error.toString();
         }
@@ -46,11 +59,11 @@
         static varMap = new Map();
     
         static create(value,assignment) {
-            mappings.list.set(value,new mappings($_.next,assignment));
+            mappings.list.set(value,new mappings($_Gen.next,assignment));
         }
     
         static reset() {
-            $_.reset();
+            $_Gen.reset();
 
             mappings.list = new Map();
             mappings.varMap = new Map();
@@ -80,21 +93,7 @@
                 this.assignment = this.assignment.replaceAll(i,mappings.list.get(i).escapedVariable);
                 this.dependencies.add(i);
             }
-    
-    
-            this.required = false;
-        }
-    
-        require() {
-            if(this.required) {
-                return;
-            }
-    
-            this.required = true;
-    
-            for(var i of this.dependencies) {
-                mappings.varMap.get(i).require();
-            }
+
         }
     
         getDependencies() {
@@ -108,24 +107,24 @@
     
     }
     
-    class $_ {
+    class $_Gen {
         static leftNum = 0;
         static rightNum = 0;
         static leftSize = 2;
         static rightSize = 2;
 
         static reset() {
-            $_.leftNum = 0;
-            $_.rightNum = 0;
-            $_.leftSize = 2;
-            $_.rightSize = 2;
+            $_Gen.leftNum = 0;
+            $_Gen.rightNum = 0;
+            $_Gen.leftSize = 2;
+            $_Gen.rightSize = 2;
         }
     
         static generate() {
-            var left = $_.leftNum.toString(2).padStart(Math.log2($_.leftSize),"_");;
+            var left = $_Gen.leftNum.toString(2).padStart(Math.log2($_Gen.leftSize),"_");;
             left = left.replaceAll("0","_");
             left = left.replaceAll("1","$");
-            var right = $_.rightNum.toString(2).padStart(Math.log2($_.rightSize),"_");
+            var right = $_Gen.rightNum.toString(2).padStart(Math.log2($_Gen.rightSize),"_");
             right = right.replaceAll("0","_");
             right = right.replaceAll("1","$");
     
@@ -133,35 +132,35 @@
         }
     
         static get next() {
-            var ret = $_.generate();
+            var ret = $_Gen.generate();
             
             // go through all right numbers
-            $_.rightNum++;
-            if($_.rightNum === $_.rightSize) {
-                $_.rightNum = 0;
+            $_Gen.rightNum++;
+            if($_Gen.rightNum === $_Gen.rightSize) {
+                $_Gen.rightNum = 0;
                 
                 // go through all left numbers
-                $_.leftNum++;
+                $_Gen.leftNum++;
                 
                 // all combinations for this size found
-                if($_.leftNum === $_.leftSize) {
-                    $_.leftNum = 0;
+                if($_Gen.leftNum === $_Gen.leftSize) {
+                    $_Gen.leftNum = 0;
     
                     // increase sizes in a way that all combinations are used
                     // (not in order of increasing size after variable 196, but its fairly close)
-                    var ls = $_.leftSize;
-                    var rs = $_.rightSize;
+                    var ls = $_Gen.leftSize;
+                    var rs = $_Gen.rightSize;
                     if (ls === rs) {
-                        $_.leftSize <<= 1;
-                        $_.rightSize = 2;
+                        $_Gen.leftSize <<= 1;
+                        $_Gen.rightSize = 2;
                     } else if(ls<<1 === rs) {
-                        $_.leftSize = rs;
+                        $_Gen.leftSize = rs;
                     } else if(ls > rs) {
-                        $_.leftSize = rs;
-                        $_.rightSize = ls;
+                        $_Gen.leftSize = rs;
+                        $_Gen.rightSize = ls;
                     } else {
-                        $_.leftSize = rs;
-                        $_.rightSize = ls << 1;
+                        $_Gen.leftSize = rs;
+                        $_Gen.rightSize = ls << 1;
                     } 
                 }
             }
@@ -178,15 +177,17 @@
         }
         
         mappings.create(name,mappingDefs[name].assignment);
+        console.log(`${name}: ${mappings.list.get(name).variable}`);
     }
     
-    function compile(js) {
+    function compile(js,evaluate=true) {
         var chars = [];
 
         mappings.reset();
 
-        recursiveGenerate("constructor");
-        recursiveGenerate("return ");
+        if(evaluate) {
+            recursiveGenerate("constructor");
+        }
 
         for(var i of js) {
             if(mappingDefs.hasOwnProperty(i)) {
@@ -206,7 +207,7 @@
 
         for(var i of js.matchAll(/([A-Za-z1-9_-])+/g)) {
             if(words.has(i[0])) {
-                if(!duplicates.includes(i[0])) {
+                if(!duplicates.includes(i[0]) && !["true","false","[object Object]","Infinity","undefined","constructor","fontcolor","NumberConstructor","StringConstructor","String","toString","return","fromCharCode"].includes(i[0])) {
                     duplicates.push(i[0]);
                 }
             } else {
@@ -214,14 +215,13 @@
             }
         }
 
+        // TODO prevent substrings from replacing already replaced strings
         for(var i of duplicates) {
             if(i.length < 2) {
                 continue; 
             }
             mappings.create(i,i.split("").join("+"));
             var variable = mappings.list.get(i).variable;
-            console.log(mappings.list.get(i));
-            console.log(mappings.list.get(i).variable);
             var index = js.indexOf(i);
 
             while(index != -1) {
@@ -236,16 +236,31 @@
 
         var inits = new Set();
         mappings.list.forEach(_=>inits.add(_.variable.split(".")[0]));
+        console.log([...inits]);
         inits = [...inits];
 
         console.log(mappings.list);
         console.log([...mappings.list]);
         var assignments = [...mappings.list].map(([_,$])=>`${$.variable}=${$.assignment}`);
-        var construct = mappings.list.get("constructor").assignment;
+        var construct;
+        if(evaluate) {
+            construct = mappings.list.get("constructor").assignment;
+        }
 
-        // return `${(inits.join("={};"))}={};((${(inits.join(","))})=>{${assignments.join(";")};})(${(inits.join(","))});(()=>(_=>_)[${construct}](${chars.join("+")}))()()`;
-        // return `(((${(inits.join(","))})=>{${assignments.join(";")};((_=>_)[${construct}](${chars.join("+")}))()})(${inits.map(_=>"{}").join(",")}));`;
-        return `(()=>(_=>_)[${construct}](${chars.join("+")}))(${inits.join("={},")}={},${assignments.join(",")})()`;
+        for(var i of inits) {
+            console.log(i+"={}");
+            eval(i+"={}");
+        }
+        for(var i of assignments) {
+            console.log(i);
+            eval(i);
+        }
+
+        if(evaluate) {
+            return `(()=>(_=>_)[${construct}](${chars.join("+")}))(${inits.join("={},")}={},${assignments.join(",")})()`;
+        } else {
+            return `(()=>${chars.join("+")})(${inits.join("={},")}={},${assignments.join(",")})`;
+        }
     }
     
     function init() {
@@ -349,6 +364,8 @@
     
     
     init();
+
+    outputText.value = compile("alert(1)");
 
     // console.log(compile("alert(1)"));
     // console.log(compile("console.log(`꧁﷽꧂`)"));
