@@ -1,0 +1,427 @@
+.<script>
+    function dc(element,parent,attributes=[]) {
+        var e = document.createElement(element);
+        for(var i of attributes) {
+            e[i[0]] = i[1];
+        }
+        parent.appendChild(e);
+        return e;
+    }
+    
+    var db = document.body;
+
+    db.innerText="";
+
+    dc("title",document.head,[["innerText","JSFrick"]]);
+    dc("link",document.head,[["rel","icon"],["href","data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAENJREFUOE9j5BaW/89AAWAcNYBhEIfBhYsPUCLXQF+BAVkMxAcBnF4AKYYpgpmELAZj09YAZD8MUS9QFIjEZlCKUyIAiidM0QWXGX0AAAAASUVORK5CYII="]]);
+    dc("style",document.head,[["type","text/css"],["innerHTML",`
+        html {background-color: #0b131f;color: #dbe4ff;font-family: consolas, monospace;}textarea,input {background-color: #090f16;color: #dbe4ff;border: 1px solid #bbbbff;border-style: none solid;box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px;padding: 0.5em;}button {background-color: #090f16;color: #dbe4ff;border: 1px solid rgb(187, 187, 255);border-radius: 5px;margin-left: 1em;padding: 0.3em;box-shadow: rgb(0 0 0 / 80%) 0px 4px 6px, #000000 0px 3px 6px;}button:active {background-color: #;box-shadow: none;transform: translateY(3px);}button:hover {background-color: rgb(41 41 63);}a {color: #9898ff;}a:visted {color: #9898ff;}a:active {color: #d7d7ff;}.css-checkbox { position: absolute; overflow: hidden; clip: rect(0 0 0 0); height: 1px; width: 1px; margin: -1px; padding: 0; border: 0; }#inputPreview { display: flex; gap: 20px; justify-content: center;	}.css-checkbox + label { position: relative; cursor: pointer; display: inline-flex; align-items: center; height: 26px; color: #dbe4ff; user-select: none; }.css-checkbox + label::before { content: " "; display: inline-block; vertical-align: middle; margin-right: 3px; width: 20px; height: 20px; background-color: #090f16; border: 1px solid #dbe4ff; border-radius: 4px; box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px; }.css-checkbox:checked + label::after { content: "*"; position: absolute; display: flex; justify-content: right; margin-left: 0px; left: 0px; top: -1px; text-align: center; background-color: transparent; font-size: 32px; height: 20px; width: 20px; }.inline { display: inline; }`]]);
+
+    dc("h1",db,[["innerText","JSFrick"]]);
+    dc("p",db,[["innerHTML","JSFrick is an esotaric programming style of javascript inspired by <a href='http://www.jsfuck.com/'>JSFuck</a>. It uses only non-alphanumeric characters, also excluding `\"\' and / so that strings cannot be created directly. Try using the form below to convert any valid javasctipt or string into JSFrick"]]);
+    var div = dc("div",db);
+    dc("span",div,[["innerText","JS: "]]);
+    var inputText = dc("input",div,[["type","text"],["style","width:20em;height: 1.5em;"],["placeholder","Enter JS here"],["value","alert(1)"]]);
+    var div2 = dc("div",div,[["style","vertical-align: middle;display: inline;margin-left: 1em;"]]);
+    var shouldEval = dc("input",div2,[["type","checkbox"],["className","css-checkbox"],["name","cssCheckbox"],["id","evelCheck"],["style","box-shadow: none;"],["checked","true"]]);
+    dc("label",div2,[["innerText","eval"],["htmlFor","evelCheck"]]);
+    var buttonDiv = dc("div",div,[["className","inline"]]);
+    var button = dc("button",buttonDiv,[["innerText","encode"]]);
+    dc("p",div,[["innerText","V"]]);
+    dc("p",div,[["innerText","V"]]);
+    dc("p",div,[["innerText","JS Frick: "]]);
+    var outputText = dc("textarea",div,[["style","width:400px;height: 250px;"]]);
+    dc("br",div,[]);
+    dc("br",div,[]);
+    var copyButtonDiv = dc("div",div,[["className","inline"]]);
+    var copyButton = dc("button",copyButtonDiv,[["innerText","copy to clipboard"]]);
+    var runButtonDiv = dc("div",div,[["className","inline"]]);
+    var runButton = dc("button",runButtonDiv,[["innerText","run this"]]);
+    var errorPre = dc("pre", db,[["style","color: #ffa5a5;"]]);
+    var runPre = dc("pre", db,[]);
+
+    buttonDiv.onclick = function () {
+        var input = inputText.value;
+        try {
+            outputText.value = compile(input,shouldEval.checked===true);
+        } catch (error) {
+            errorPre.innerText = error.toString();
+        }
+    };
+
+    copyButtonDiv.onclick = function () {
+        navigator.clipboard.writeText(outputText.value).then(() => {
+            runPre.innerText = "copied!";
+        }, () => { 
+            outputText.select();
+            outputText.setSelectionRange(0, 99999999);
+            document.execCommand("copy");
+            runPre.innerText = "copied!";
+        });
+    };
+
+    runButtonDiv.onclick = function () {
+        var input = outputText.value;
+        try {
+            runPre.innerText = eval(input);
+        } catch (error) {
+            errorPre.innerText = error.toString();
+        }
+    };
+
+    var mappingDefs = {};
+    
+    class mappings {
+        static list = new Map();
+        static varMap = new Map();
+    
+        static create(value,assignment) {
+            mappings.list.set(value,new mappings($_Gen.next,assignment));
+        }
+    
+        static reset() {
+            $_Gen.reset();
+
+            mappings.list = new Map();
+            mappings.varMap = new Map();
+        }
+    
+        constructor(variable,assignment) {
+            this.variable = variable;
+            this.escapedVariable = variable.replaceAll("$","$$$$");
+            mappings.varMap.set(variable,this);
+            this.rawAssignment = assignment;
+            this.assignment = assignment;
+            this.dependencies = new Set();
+    
+            for(var i of new Map([...mappings.list.entries()].sort((a,b) => b[0].length - a[0].length))) {
+                if(i[0].length > 1) {
+                    if(this.assignment.includes(i[0])) {
+                        this.assignment = this.assignment.replaceAll(i[0],i[1].escapedVariable);
+                        this.dependencies.add(i[0]);
+                    }
+                } else {
+                    break;
+                }
+            }
+            var toReplace = [...this.assignment.matchAll(new RegExp("[^!$%^&*()_+{}|:<>?\\-=\\[\\]\\\\;,.~]","g"))].map(_=>_[0]);
+            
+            for (var i of toReplace) {
+                this.assignment = this.assignment.replaceAll(i,mappings.list.get(i).escapedVariable);
+                this.dependencies.add(i);
+            }
+
+        }
+    
+        getDependencies() {
+            var ret = new Set();
+            for(var i of this.dependencies) {
+                ret.add(i);
+                [...mappings.list.get(i).getDependencies()].map(_=>ret.add(_));
+            }
+            return ret;
+        }
+    
+    }
+    
+    class $_Gen {
+        static leftNum = 0;
+        static rightNum = 0;
+        static leftSize = 2;
+        static rightSize = 2;
+
+        static reset() {
+            $_Gen.leftNum = 0;
+            $_Gen.rightNum = 0;
+            $_Gen.leftSize = 2;
+            $_Gen.rightSize = 2;
+        }
+    
+        static generate() {
+            var left = $_Gen.leftNum.toString(2).padStart(Math.log2($_Gen.leftSize),"_");;
+            left = left.replaceAll("0","_");
+            left = left.replaceAll("1","$");
+            var right = $_Gen.rightNum.toString(2).padStart(Math.log2($_Gen.rightSize),"_");
+            right = right.replaceAll("0","_");
+            right = right.replaceAll("1","$");
+    
+            return left+"."+right;
+        }
+    
+        static get next() {
+            var ret = $_Gen.generate();
+            
+            // go through all right numbers
+            $_Gen.rightNum++;
+            if($_Gen.rightNum === $_Gen.rightSize) {
+                $_Gen.rightNum = 0;
+                
+                // go through all left numbers
+                $_Gen.leftNum++;
+                
+                // all combinations for this size found
+                if($_Gen.leftNum === $_Gen.leftSize) {
+                    $_Gen.leftNum = 0;
+    
+                    // increase sizes in a way that all combinations are used
+                    // (not in order of increasing size after variable 196, but its fairly close)
+                    var ls = $_Gen.leftSize;
+                    var rs = $_Gen.rightSize;
+                    if (ls === rs) {
+                        $_Gen.leftSize <<= 1;
+                        $_Gen.rightSize = 2;
+                    } else if(ls<<1 === rs) {
+                        $_Gen.leftSize = rs;
+                    } else if(ls > rs) {
+                        $_Gen.leftSize = rs;
+                        $_Gen.rightSize = ls;
+                    } else {
+                        $_Gen.leftSize = rs;
+                        $_Gen.rightSize = ls << 1;
+                    } 
+                }
+            }
+            
+            return ret;
+        }
+    }
+
+    function spliceSlice(str, index, count, add) {
+        if (index < 0) {
+            index = str.length + index;
+            if (index < 0) {
+            index = 0;
+            }
+        }
+
+        return str.slice(0, index) + (add || "") + str.slice(index + count);
+    }
+
+    function recursiveGenerate(name) {
+        for(var i of mappingDefs[name].dependencies) {
+            if(!mappings.list.has(i)) {
+                recursiveGenerate(i);
+            }
+        }
+        
+        mappings.create(name,mappingDefs[name].assignment);
+    }
+    
+    function compile(js,evaluate=true) {
+        var chars = [];
+
+        mappings.reset();
+
+        if(evaluate) {
+            recursiveGenerate("constructor");
+        }
+
+        for(var i of js) {
+            if(mappingDefs.hasOwnProperty(i)) {
+                if (!mappings.list.has(i)) {
+                    recursiveGenerate(i);
+                }
+                chars.push(mappings.list.get(i).variable);
+            } else {
+                mappingDefs[i] = {assignment:`fromCharCode(${(i.charCodeAt(0)+"").split("").join("+")})`, dependencies:["0","1","2","3","4","5","6","7","8","9","true","false","[object Object]","undefined"," ","a","c","d","e","f","n","o","r","s","t","u","constructor","NumberConstructor","StringConstructor","m","String","toString","return ","p","h","C","fromCharCode"]}
+                recursiveGenerate(i);
+                chars.push(mappings.list.get(i).variable);
+            }
+        }
+
+        var words = new Set();
+        var duplicates = [];
+        var reserved = ["true","false","[object Object]","Infinity","undefined","constructor","fontcolor","NumberConstructor","StringConstructor","String","toString","return","fromCharCode"];
+
+        for(var i of js.matchAll(/([A-Za-z1-9])+/g)) {
+            if(i[0].length < 2) {
+                continue;
+            }
+            if(words.has(i[0])) {
+                if(!duplicates.includes(i[0]) && !reserved.includes(i[0])) {
+                    duplicates.push(i[0]);
+                }
+            } else {
+                words.add(i[0]);
+            }
+        }
+
+        // create a list of all duplicates that are substrings of reserved words/other duplicates
+        var substringChecks = {};
+        for(var i of duplicates) {
+            for(var j of reserved) {
+                if(j.includes(i)) {
+                    if(!substringChecks[i]) {
+                        substringChecks[i] = [];
+                    }
+                    substringChecks[i].push([j, -j.indexOf(i), j.length - j.indexOf(i)]);
+                }
+            }
+            for(var j of duplicates) {
+                if(j.includes(i) && j !== i) {
+                    if(!substringChecks[i]) {
+                        substringChecks[i] = [];
+                    }
+                    substringChecks[i].push([j, -j.indexOf(i), j.length - j.indexOf(i)]);
+                }
+            }
+        }
+        
+        for(var i of duplicates) {
+            if(i.length < 2) {
+                continue; 
+            }
+            mappings.create(i,i.split("").join("+"));
+            var variable = mappings.list.get(i).variable;
+            var index = js.indexOf(i);
+
+            mainLoop:
+            while(index != -1) {
+                if(substringChecks[i]) {
+                    for(var j of substringChecks[i]) {
+                        word = js.slice(index + j[1], index + j[2]);
+                        if(word === j[0]) {
+                            index = js.indexOf(i,index+i.length);
+                            continue mainLoop;
+                        }
+                    }
+                }
+                
+                chars.splice(index,i.length);
+                chars.splice(index,0,variable);
+
+                js = spliceSlice(js,index,i.length,".");
+
+                index = js.indexOf(i,index+i.length);
+            }
+        }
+
+
+        var inits = new Set();
+        mappings.list.forEach(_=>inits.add(_.variable.split(".")[0]));
+        inits = [...inits];
+
+        var assignments = [...mappings.list].map(([_,$])=>`${$.variable}=${$.assignment}`);
+        var construct;
+        if(evaluate) {
+            construct = mappings.list.get("constructor").assignment;
+        }
+
+        for(var i of inits) {
+            eval(i+"={}");
+        }
+        for(var i of assignments) {
+            eval(i);
+        }
+
+        if(evaluate) {
+            return `(()=>(_=>_)[${construct}](${chars.join("+")}))(${inits.join("={},")}={},${assignments.join(",")})()`;
+        } else {
+            return `(()=>${chars.join("+")})(${inits.join("={},")}={},${assignments.join(",")})`;
+        }
+    }
+    
+    function init() {
+        mappings.create("0", "+[]+[]");
+        mappings.create("1", "-~[]+[]");
+        mappings.create("2", "-~-~[]+[]");
+        mappings.create("3", "-~-~-~[]+[]");
+        mappings.create("4", "-~-~-~-~[]+[]");
+        mappings.create("5", "-~-~-~-~-~[]+[]");
+        mappings.create("6", "-~-~-~-~-~-~[]+[]");
+        mappings.create("7", "-~-~-~-~-~-~-~[]+[]");
+        mappings.create("8", "(-~-~-~-~[]<<-~[])+[]");
+        mappings.create("9", "+([-~[]]+(+[]))+~[]+[]");
+        
+        mappings.create("false", "![]+[]");
+        mappings.create("true", "!![]+[]");
+        mappings.create("[object Object]", "[]+{}");
+        mappings.create("Infinity", "5**5**5+[]");
+        mappings.create("undefined", "[][[]]+[]");
+        
+        mappings.create(" ", "[object Object][7]");
+        mappings.create("a", "false[1]");
+        mappings.create("b", "[object Object][2]");
+        mappings.create("c", "[object Object][5]");
+        mappings.create("d", "undefined[2]");
+        mappings.create("e", "true[3]");
+        mappings.create("f", "false[0]");
+        mappings.create("i", "Infinity[3]");
+        mappings.create("j", "[object Object][3]");
+        mappings.create("l", "false[2]");
+        mappings.create("n", "undefined[1]");
+        mappings.create("o", "[object Object][1]");
+        mappings.create("r", "true[1]");
+        mappings.create("s", "false[3]");
+        mappings.create("t", "true[0]");
+        mappings.create("u", "true[2]");
+        mappings.create("y", "Infinity[7]");
+        mappings.create("=", "((_=>_)+[])[1]");
+        mappings.create("_", "((_=>_)+[])[0]");
+        mappings.create("$", "(($=>$)+[])[0]");
+        mappings.create("(", "((()=>{})+[])[0]");
+        mappings.create(")", "((()=>{})+[])[1]");
+        mappings.create("{", "((_=>{})+[])[3]");
+        mappings.create("}", "((_=>{})+[])[4]");
+        mappings.create(">", "((_=>_)+[])[2]");
+        mappings.create("<", "((_=>_<_)+[])[4]");
+        mappings.create("~", "((_=>~_)+[])[3]");
+        mappings.create("!", "((_=>!_)+[])[3]");
+        mappings.create("%", "((_=>_%_)+[])[4]");
+        mappings.create("^", "((_=>_^_)+[])[4]");
+        mappings.create("&", "((_=>_&_)+[])[4]");
+        mappings.create("|", "((_=>_|_)+[])[4]");
+        mappings.create("*", "((_=>_*_)+[])[4]");
+        mappings.create("-", "((_=>_-_)+[])[4]");
+        mappings.create("+", "((_=>_+_)+[])[4]");
+        mappings.create("[", "((_=>[])+[])[3]");
+        mappings.create("]", "((_=>[])+[])[4]");
+        mappings.create(";", "((_=>{;})+[])[4]");
+        mappings.create(":", "((_=>{_?_:_})+[])[7]");
+        mappings.create("?", "((_=>{_?_:_})+[])[5]");
+        mappings.create(".", "((_=>{_._})+[])[5]");
+        mappings.create(",", "((_=>[,])+[])[4]");
+        
+        mappings.create("I", "Infinity[0]");
+        mappings.create("O", "[object Object][8]");
+        
+        mappings.create("constructor", "c+o+n+s+t+r+u+c+t+o+r");
+        mappings.create("fontcolor", "([]+[])[f+o+n+t+c+o+l+o+r]()");
+        mappings.create("NumberConstructor", "(+[])[constructor]");
+        mappings.create("StringConstructor", "([]+[])[constructor]");
+        mappings.create("m", "(NumberConstructor+[])[1+1]");
+        
+        mappings.create('"', "fontcolor[1+2]");
+        mappings.create("/", "fontcolor[2+5]");
+        
+        mappings.create("String", "StringConstructor[n+a+m+e]");
+        mappings.create("toString", "t+o+String");
+        mappings.create("return ", "r+e+t+u+r+n+ ");
+        
+        mappings.create("p", "(+(2+1+1))[toString](3+1)[1]");
+        mappings.create("h", "(+(1+0+1))[toString](2+1)[1]");
+        mappings.create("C", "((()=>{})[constructor](return +e+s+c+a+p+e)()(((_=>_<_)+[])[4]))[2]");
+        
+        mappings.create("fromCharCode", "([]+[])[constructor][f+r+o+m+C+h+a+r+C+o+d+e]");
+        
+        mappings.create("g", "String[5]");
+        mappings.create("k", "(+(2+0))[toString](2+1)");
+        mappings.create("q", "(+(2+6))[toString](2+7)");
+        mappings.create("v", "(+(3+1))[toString](3+2)");
+        mappings.create("w", "(+(3+2))[toString](3+3)");
+        mappings.create("x", "(+(3+3))[toString](3+4)");
+        mappings.create("z", "(+(3+5))[toString](3+6)");
+    
+        for(var [k,v] of mappings.list) {
+            mappingDefs[k] = {assignment:v.rawAssignment, dependencies:[...v.getDependencies()]};
+        }
+        
+        mappings.reset();
+    }
+    
+    
+    init();
+
+    outputText.value = compile("alert(1)");
+
+</script>
