@@ -7,6 +7,8 @@
         parent.appendChild(e);
         return e;
     }
+    // function dc(e,t,r=[]){var i=document.createElement(e);for(var o of r)i[o[0]]=o[1];return t.appendChild(i),i}var db=document.body;db.innerText="",dc("title",document.head,[["innerText","JSFrick"]]),dc("link",document.head,[["rel","icon"],["href","data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAENJREFUOE9j5BaW/89AAWAcNYBhEIfBhYsPUCLXQF+BAVkMxAcBnF4AKYYpgpmELAZj09YAZD8MUS9QFIjEZlCKUyIAiidM0QWXGX0AAAAASUVORK5CYII="]]),dc("style",document.head,[["type","text/css"],["innerHTML",`html {background-color: #0b131f;color: #dbe4ff;font-family: consolas, monospace;}textarea,input {background-color: #090f16;color: #dbe4ff;border: 1px solid #bbbbff;border-style: none solid;box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px;padding: 0.5em;}button {background-color: #090f16;color: #dbe4ff;border: 1px solid rgb(187, 187, 255);border-radius: 5px;margin-left: 1em;padding: 0.3em;box-shadow: rgb(0 0 0 / 80%) 0px 4px 6px, #000000 0px 3px 6px;}button:active {background-color: #;box-shadow: none;transform: translateY(3px);}button:hover {background-color: rgb(41 41 63);}a {color: #9898ff;}a:visted {color: #9898ff;}a:active {color: #d7d7ff;}.css-checkbox { position: absolute; overflow: hidden; clip: rect(0 0 0 0); height: 1px; width: 1px; margin: -1px; padding: 0; border: 0; }#inputPreview { display: flex; gap: 20px; justify-content: center;	}.css-checkbox + label { position: relative; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; height: 26px; color: #dbe4ff; user-select: none; }.css-checkbox + label::before { content: " "; display: inline-block; vertical-align: middle; margin-right: 3px; width: 20px; height: 20px; background-color: #090f16; border: 1px solid #dbe4ff; border-radius: 4px; box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px; }.css-checkbox:checked + label::after { content: "*"; position: absolute; display: flex; justify-content: right; margin-left: 0px; left: 0px; top: -1px; text-align: center; background-color: transparent; font-size: 32px; height: 20px; width: 20px; }`]]),dc("h1",db,[["innerText","JSFrick"]]),dc("p",db,[["innerHTML","JSFrick is an esotaric programming style of javascript inspired by <a href='http://www.jsfuck.com/'>JSFuck</a>. It uses only non-alphanumeric characters, also excluding `\"' and / so that strings cannot be created directly. Try using the form below to convert any valid javasctipt or string into JSFrick"]]);var div=dc("div",db);dc("span",div,[["innerText","JS: "]]);var inputText=dc("input",div,[["type","text"],["style","width:20em;height: 1.5em;"],["placeholder","Enter JS here"],["value","alert(1)"]]),div2=dc("div",div,[["style","vertical-align: middle;display: inline;margin-left: 1em;"]]),shouldEval=dc("input",div2,[["type","checkbox"],["className","css-checkbox"],["name","cssCheckbox"],["id","evelCheck"],["style","box-shadow: none;"],["checked","true"]]);dc("label",div2,[["innerText","eval"],["htmlFor","evelCheck"]]);var button=dc("button",div,[["innerText","compile"]]);dc("p",div,[["innerText","V"]]),dc("p",div,[["innerText","V"]]),dc("p",div,[["innerText","JS Frick: "]]);var outputText=dc("textarea",div,[["style","width:400px;height: 250px;"]]),runButton=dc("button",div,[["innerText","run this"]]),errorPre=dc("pre",db,[["style","color: #ffa5a5;"]]);
+
     var db = document.body;
 
     db.innerText="";
@@ -20,6 +22,9 @@
         button {background-color: #090f16;color: #dbe4ff;border: 1px solid rgb(187, 187, 255);border-radius: 5px;margin-left: 1em;padding: 0.3em;box-shadow: rgb(0 0 0 / 80%) 0px 4px 6px, #000000 0px 3px 6px;}
         button:active {background-color: #;box-shadow: none;transform: translateY(3px);}
         button:hover {background-color: rgb(41 41 63);}
+        a {color: #9898ff;}
+        a:visted {color: #9898ff;}
+        a:active {color: #d7d7ff;}
         .css-checkbox { position: absolute; overflow: hidden; clip: rect(0 0 0 0); height: 1px; width: 1px; margin: -1px; padding: 0; border: 0; }
         #inputPreview { display: flex; gap: 20px; justify-content: center;	}
         .css-checkbox + label { position: relative; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; height: 26px; color: #dbe4ff; user-select: none; }
@@ -33,7 +38,7 @@
     dc("span",div,[["innerText","JS: "]]);
     var inputText = dc("input",div,[["type","text"],["style","width:20em;height: 1.5em;"],["placeholder","Enter JS here"],["value","alert(1)"]]);
     var div2 = dc("div",div,[["style","vertical-align: middle;display: inline;margin-left: 1em;"]]);
-    var shouldEval = dc("input",div2,[["type","checkbox"],["className","css-checkbox"],["name","cssCheckbox"],["id","evelCheck"],["style","box-shadow: none;"]]);
+    var shouldEval = dc("input",div2,[["type","checkbox"],["className","css-checkbox"],["name","cssCheckbox"],["id","evelCheck"],["style","box-shadow: none;"],["checked","true"]]);
     dc("label",div2,[["innerText","eval"],["htmlFor","evelCheck"]]);
     var button = dc("button",div,[["innerText","compile"]]);
     dc("p",div,[["innerText","V"]]);
@@ -169,6 +174,17 @@
         }
     }
 
+    function spliceSlice(str, index, count, add) {
+        if (index < 0) {
+            index = str.length + index;
+            if (index < 0) {
+            index = 0;
+            }
+        }
+
+        return str.slice(0, index) + (add || "") + str.slice(index + count);
+    }
+
     function recursiveGenerate(name) {
         for(var i of mappingDefs[name].dependencies) {
             if(!mappings.list.has(i)) {
@@ -177,7 +193,7 @@
         }
         
         mappings.create(name,mappingDefs[name].assignment);
-        console.log(`${name}: ${mappings.list.get(name).variable}`);
+        // console.log(`${name}: ${mappings.list.get(name).variable}`);
     }
     
     function compile(js,evaluate=true) {
@@ -204,10 +220,14 @@
 
         var words = new Set();
         var duplicates = [];
+        var reserved = ["true","false","[object Object]","Infinity","undefined","constructor","fontcolor","NumberConstructor","StringConstructor","String","toString","return","fromCharCode"];
 
         for(var i of js.matchAll(/([A-Za-z1-9_-])+/g)) {
+            if(i[0].length < 2) {
+                continue;
+            }
             if(words.has(i[0])) {
-                if(!duplicates.includes(i[0]) && !["true","false","[object Object]","Infinity","undefined","constructor","fontcolor","NumberConstructor","StringConstructor","String","toString","return","fromCharCode"].includes(i[0])) {
+                if(!duplicates.includes(i[0]) && !reserved.includes(i[0])) {
                     duplicates.push(i[0]);
                 }
             } else {
@@ -215,7 +235,29 @@
             }
         }
 
-        // TODO prevent substrings from replacing already replaced strings
+        // create a list of all duplicates that are substrings of reserved words/other duplicates
+        var substringChecks = {};
+        for(var i of duplicates) {
+            for(var j of reserved) {
+                if(j.includes(i)) {
+                    if(!substringChecks[i]) {
+                        substringChecks[i] = [];
+                    }
+                    substringChecks[i].push([j, -j.indexOf(i), j.length - j.indexOf(i)]);
+                }
+            }
+            for(var j of duplicates) {
+                if(j.includes(i) && j !== i) {
+                    if(!substringChecks[i]) {
+                        substringChecks[i] = [];
+                    }
+                    substringChecks[i].push([j, -j.indexOf(i), j.length - j.indexOf(i)]);
+                }
+            }
+        }
+
+        // chars = js.split("");
+        
         for(var i of duplicates) {
             if(i.length < 2) {
                 continue; 
@@ -224,10 +266,35 @@
             var variable = mappings.list.get(i).variable;
             var index = js.indexOf(i);
 
+            mainLoop:
             while(index != -1) {
+                if(substringChecks[i]) {
+                    for(var j of substringChecks[i]) {
+                        word = js.slice(index + j[1], index + j[2]);
+                        if(word === j[0]) {
+                            index = js.indexOf(i,index+i.length);
+                            continue mainLoop;
+                        }
+                    }
+                }
+
+                // if(i==="input") {
+                //     debugger
+                // }
+                // console.log(chars.slice(index-2,index+i.length+2));
+                
                 chars.splice(index,i.length);
                 chars.splice(index,0,variable);
-                js = js.replace(i,".");
+
+                // console.log(chars.slice(index-2,index+i.length+2));
+
+                // console.log(variable + " " + i);
+
+                console.log(js.slice(index+-3,index+i.length+4));
+                js = spliceSlice(js,index,i.length,".");
+                console.log(js.slice(index+-3,index+i.length+4));
+
+                // js = js.replace(i,".");
 
                 index = js.indexOf(i,index+i.length);
             }
@@ -236,11 +303,11 @@
 
         var inits = new Set();
         mappings.list.forEach(_=>inits.add(_.variable.split(".")[0]));
-        console.log([...inits]);
+        // console.log([...inits]);
         inits = [...inits];
 
-        console.log(mappings.list);
-        console.log([...mappings.list]);
+        // console.log(mappings.list);
+        // console.log([...mappings.list]);
         var assignments = [...mappings.list].map(([_,$])=>`${$.variable}=${$.assignment}`);
         var construct;
         if(evaluate) {
@@ -248,11 +315,11 @@
         }
 
         for(var i of inits) {
-            console.log(i+"={}");
+            // console.log(i+"={}");
             eval(i+"={}");
         }
         for(var i of assignments) {
-            console.log(i);
+            // console.log(i);
             eval(i);
         }
 
