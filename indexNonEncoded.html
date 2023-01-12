@@ -1,5 +1,7 @@
 .<script>
-    function dc(element,parent,attributes=[]) {
+    // create an element with the given attributes in the form [ [name, value], [name, value] ]
+    // and append it to the provided parent
+    function createElement(element,parent,attributes=[]) {
         var e = document.createElement(element);
         for(var i of attributes) {
             e[i[0]] = i[1];
@@ -8,38 +10,58 @@
         return e;
     }
     
+    // store document body
     var db = document.body;
 
+    // remove . from body
     db.innerText="";
 
-    dc("title",document.head,[["innerText","JSFrick"]]);
-    dc("link",document.head,[["rel","icon"],["href","data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAENJREFUOE9j5BaW/89AAWAcNYBhEIfBhYsPUCLXQF+BAVkMxAcBnF4AKYYpgpmELAZj09YAZD8MUS9QFIjEZlCKUyIAiidM0QWXGX0AAAAASUVORK5CYII="]]);
-    dc("style",document.head,[["type","text/css"],["innerHTML",`
+    // set title
+    createElement("title",document.head,[["innerText","JSFrick"]]);
+    // set tab icon
+    createElement("link",document.head,[["rel","icon"],["href","data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAENJREFUOE9j5BaW/89AAWAcNYBhEIfBhYsPUCLXQF+BAVkMxAcBnF4AKYYpgpmELAZj09YAZD8MUS9QFIjEZlCKUyIAiidM0QWXGX0AAAAASUVORK5CYII="]]);
+    // set style
+    createElement("style",document.head,[["type","text/css"],["innerHTML",`
         html {background-color: #0b131f;color: #dbe4ff;font-family: consolas, monospace;}textarea,input {background-color: #090f16;color: #dbe4ff;border: 1px solid #bbbbff;border-style: none solid;box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px;padding: 0.5em;}button {background-color: #090f16;color: #dbe4ff;border: 1px solid rgb(187, 187, 255);border-radius: 5px;margin-left: 1em;padding: 0.3em;box-shadow: rgb(0 0 0 / 80%) 0px 4px 6px, #000000 0px 3px 6px;}button:active {background-color: #;box-shadow: none;transform: translateY(3px);}button:hover {background-color: rgb(41 41 63);}a {color: #9898ff;}a:visted {color: #9898ff;}a:active {color: #d7d7ff;}.css-checkbox { position: absolute; overflow: hidden; clip: rect(0 0 0 0); height: 1px; width: 1px; margin: -1px; padding: 0; border: 0; }#inputPreview { display: flex; gap: 20px; justify-content: center;	}.css-checkbox + label { position: relative; cursor: pointer; display: inline-flex; align-items: center; height: 26px; color: #dbe4ff; user-select: none; }.css-checkbox + label::before { content: " "; display: inline-block; vertical-align: middle; margin-right: 3px; width: 20px; height: 20px; background-color: #090f16; border: 1px solid #dbe4ff; border-radius: 4px; box-shadow: inset rgb(0 0 0 / 67%) 0px 4px 6px, inset rgb(0 0 0 / 87%) 0px 3px 6px; }.css-checkbox:checked + label::after { content: "*"; position: absolute; display: flex; justify-content: right; margin-left: 0px; left: 0px; top: -1px; text-align: center; background-color: transparent; font-size: 32px; height: 20px; width: 20px; }.inline { display: inline; }`]]);
 
-    dc("h1",db,[["innerText","JSFrick"]]);
-    dc("p",db,[["innerHTML","JSFrick is an esotaric programming style of javascript inspired by <a href='http://www.jsfuck.com/'>JSFuck</a>. It uses only non-alphanumeric characters, also excluding `\"\' and / so that strings cannot be created directly. Try using the form below to convert any valid javasctipt or string into JSFrick"]]);
-    var div = dc("div",db);
-    dc("span",div,[["innerText","JS: "]]);
-    var inputText = dc("input",div,[["type","text"],["style","width:20em;height: 1.5em;"],["placeholder","Enter JS here"],["value","alert(1)"]]);
-    var div2 = dc("div",div,[["style","vertical-align: middle;display: inline;margin-left: 1em;"]]);
-    var shouldEval = dc("input",div2,[["type","checkbox"],["className","css-checkbox"],["name","cssCheckbox"],["id","evelCheck"],["style","box-shadow: none;"],["checked","true"]]);
-    dc("label",div2,[["innerText","eval"],["htmlFor","evelCheck"]]);
-    var buttonDiv = dc("div",div,[["className","inline"]]);
-    var button = dc("button",buttonDiv,[["innerText","encode"]]);
-    dc("p",div,[["innerText","V"]]);
-    dc("p",div,[["innerText","V"]]);
-    dc("p",div,[["innerText","JS Frick: "]]);
-    var outputText = dc("textarea",div,[["style","width:400px;height: 250px;"]]);
-    dc("br",div,[]);
-    dc("br",div,[]);
-    var copyButtonDiv = dc("div",div,[["className","inline"]]);
-    var copyButton = dc("button",copyButtonDiv,[["innerText","copy to clipboard"]]);
-    var runButtonDiv = dc("div",div,[["className","inline"]]);
-    var runButton = dc("button",runButtonDiv,[["innerText","run this"]]);
-    var errorPre = dc("pre", db,[["style","color: #ffa5a5;"]]);
-    var runPre = dc("pre", db,[]);
+    // header
+    createElement("h1",db,[["innerText","JSFrick"]]);
+    // description
+    createElement("p",db,[["innerHTML","JSFrick is an esotaric programming style of javascript inspired by <a href='http://www.jsfuck.com/'>JSFuck</a>. It uses only non-alphanumeric characters, also excluding `\"\' and / so that strings cannot be created directly. Try using the form below to convert any valid javasctipt or string into JSFrick"]]);
+    
+    var div = createElement("div",db);
+    // input
+    createElement("span",div,[["innerText","JS: "]]);
+    var inputText = createElement("input",div,[["type","text"],["style","width:20em;height: 1.5em;"],["placeholder","Enter JS here"],["value","alert(1)"]]);
+    
+    var div2 = createElement("div",div,[["style","vertical-align: middle;display: inline;margin-left: 1em;"]]);
+    
+    // should eval option toggle
+    var shouldEval = createElement("input",div2,[["type","checkbox"],["className","css-checkbox"],["name","cssCheckbox"],["id","evelCheck"],["style","box-shadow: none;"],["checked","true"]]);
+    createElement("label",div2,[["innerText","eval"],["htmlFor","evelCheck"]]);
+    
+    // encode button
+    var buttonDiv = createElement("div",div,[["className","inline"]]);
+    var button = createElement("button",buttonDiv,[["innerText","encode"]]);
 
+    createElement("p",div,[["innerText","V"]]);
+    createElement("p",div,[["innerText","V"]]);
+    createElement("p",div,[["innerText","JS Frick: "]]);
+    
+    // output
+    var outputText = createElement("textarea",div,[["style","width:400px;height: 250px;"]]);
+    createElement("br",div,[]);
+    createElement("br",div,[]);
+    // copy and run buttons
+    var copyButtonDiv = createElement("div",div,[["className","inline"]]);
+    var copyButton = createElement("button",copyButtonDiv,[["innerText","copy to clipboard"]]);
+    var runButtonDiv = createElement("div",div,[["className","inline"]]);
+    var runButton = createElement("button",runButtonDiv,[["innerText","run this"]]);
+    // error output
+    var errorPre = createElement("pre", db,[["style","color: #ffa5a5;"]]);
+    var runPre = createElement("pre", db,[]);
+
+    // should eval option toggle
     buttonDiv.onclick = function () {
         var input = inputText.value;
         try {
@@ -49,6 +71,7 @@
         }
     };
 
+    // copy output to clipboard
     copyButtonDiv.onclick = function () {
         navigator.clipboard.writeText(outputText.value).then(() => {
             runPre.innerText = "copied!";
@@ -60,6 +83,7 @@
         });
     };
 
+    // run output
     runButtonDiv.onclick = function () {
         var input = outputText.value;
         try {
@@ -69,8 +93,8 @@
         }
     };
 
+    // mappings from normal strings to jsFrick code
     var mappingDefs = {};
-    
     class mappings {
         static list = new Map();
         static varMap = new Map();
@@ -86,6 +110,7 @@
             mappings.varMap = new Map();
         }
     
+        // creates a new mapping and sets a new variable for the encoder
         constructor(variable,assignment) {
             this.variable = variable;
             this.escapedVariable = variable.replaceAll("$","$$$$");
@@ -113,6 +138,7 @@
 
         }
     
+        // find a list of all variables needed before a mapping
         getDependencies() {
             var ret = new Set();
             for(var i of this.dependencies) {
@@ -124,6 +150,7 @@
     
     }
     
+    // generates variable names with only _ and $ characters in order from shortest to longest
     class $_Gen {
         static leftNum = 0;
         static rightNum = 0;
@@ -186,6 +213,7 @@
         }
     }
 
+    
     function spliceSlice(str, index, count, add) {
         if (index < 0) {
             index = str.length + index;

@@ -1,9 +1,10 @@
 # JSFrick
 
-PG version of the JSF*ck encoder made by Martin Kleppe
+An esoteric javascript encoder. 
 
-JSFrick encodes any string or JS into JS that uses only the following non-alphanumeric characters `=_$(){}><~!%^&|*-+[];:?.,\`. characters that that can create strings (``"'`/``) are not used as an aesthetic choice and to provide a bit more difficulty for myself.
+JSFrick encodes any string or JS, into JS that uses only the following non-alphanumeric characters `=_$(){}><~!%^&|*-+[];:?.,\`. characters that that can create strings (``"'`/``) were not used as an extra challenge.
 
+Inspired by the [javascript encoder](http://www.jsfuck.com/) made by Martin Kleppe
 
 ## how it works
 
