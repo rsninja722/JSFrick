@@ -1,6 +1,6 @@
 # JSFrick
 
-An esoteric javascript encoder. 
+An esoteric javascript encoder, try it at [rsninja.dev/JSFrick](https://rsninja.dev/JSFrick/).
 
 JSFrick encodes any string or JS, into JS that uses only the following non-alphanumeric characters `=_$(){}><~!%^&|*-+[];:?.,\`. characters that that can create strings (``"'`/``) were not used as an extra challenge.
 
